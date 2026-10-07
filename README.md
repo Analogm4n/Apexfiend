@@ -70,7 +70,7 @@ The lab was designed to practice:
 
 - gMSA
 
-- RBCD
+- RBCD (Resource-based Constrained Delegation)
 
 - Lateral movement
 
