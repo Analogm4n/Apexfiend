@@ -1,4 +1,4 @@
-\# Apexfiend
+# Apexfiend
 
 
 
@@ -12,9 +12,7 @@ SQL Server, Jenkins and lateral movement.
 
 
 
-\## Overview
-
-
+## Overview
 
 Apexfiend is a 20-VM enterprise-style lab built with VirtualBox and
 
@@ -24,93 +22,81 @@ pfSense.
 
 The environment includes:
 
+- Multi-domain Active Directory forest
 
+- Windows Server infrastructure
 
-\- Multi-domain Active Directory forest
+- Segmented VLANs
 
-\- Windows Server infrastructure
+- AD CS / Enterprise PKI
 
-\- Segmented VLANs
+- SQL Server
 
-\- AD CS / Enterprise PKI
+- Jenkins
 
-\- SQL Server
+- Gitea
 
-\- Jenkins
+- Mattermost
 
-\- Gitea
+- osTicket
 
-\- Mattermost
+- Postfix / Dovecot
 
-\- osTicket
+- Internal web applications
 
-\- Postfix / Dovecot
-
-\- Internal web applications
-
-\- Workstations and service accounts
+- Workstations and service accounts
 
 
 
-\## Objectives
-
-
+## Objectives
 
 The lab was designed to practice:
 
+- Internal network enumeration
 
+- Active Directory enumeration
 
-\- Internal network enumeration
+- Kerberos attacks
 
-\- Active Directory enumeration
+- ACL abuse
 
-\- Kerberos attacks
+- SQL Server attack paths
 
-\- ACL abuse
+- AD CS abuse
 
-\- SQL Server attack paths
+- NTLM relay
 
-\- AD CS abuse
+- Jenkins abuse
 
-\- NTLM relay
+- gMSA
 
-\- Jenkins abuse
+- RBCD
 
-\- gMSA
+- Lateral movement
 
-\- RBCD
+- Privilege escalation
 
-\- Lateral movement
-
-\- Privilege escalation
-
-\- Attack-chain documentation
-
-
-
-\## Documentation
+- Attack-chain documentation
 
 
 
-\- \[Architecture](docs/01-architecture/)
+## Documentation
 
-\- \[Active Directory](docs/02-active-directory/)
+- [Architecture](docs/01-architecture/)
 
-\- \[Databases](docs/05-databases/)
+- [Active Directory](docs/02-active-directory/)
 
-\- \[PKI / AD CS](docs/06-pki/)
+- [Databases](docs/05-databases/)
 
-\- \[Jenkins](docs/07-jenkins/)
+- [PKI / AD CS](docs/06-pki/)
 
-\- \[Attack Paths](docs/08-attack-paths/)
+- [Jenkins](docs/07-jenkins/)
 
-\- \[Development Log](docs/10-development-log/)
+- [Attack Paths](docs/08-attack-paths/)
 
+- [Development Log](docs/10-development-log/)
 
-
-\## Disclaimer
-
-
+## Disclaimer
 
 Apexfiend is a private security research and training environment
 
