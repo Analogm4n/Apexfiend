@@ -2,14 +2,14 @@
 
 An Active Directory lab designed and built from scratch to practice and document offensive security / red teaming techniques against a simulated corporate environment: `corp.apexfiend.lab`.
 
-The project covers both the **infrastructure design** (network, AD, PKI, Jenkins CI/CD, databases, internal web services) and the **full execution of an intentionally designed attack chain**, from external initial access to full domain compromise (DCSync).
+The project covers both the **infrastructure design** (network, AD, PKI, Jenkins CI/CD, databases, internal web services) and the **full execution of an intentionally designed attack chain**, from external initial access to full domain compromise.
 
 ## Why this project
 
 Built to practice and demonstrate, end-to-end:
 
 - Design of realistic Active Directory architectures (OUs, delegations, ACLs, gMSA).
-- Configuration of Active Directory Certificate Services (ADCS) with an intentionally misconfigured certificate template (ESC1).
+- Configuration of Active Directory Certificate Services (ADCS) with an intentionally misconfigured certificate template.
 - Exploitation of trust relationships between SQL Server instances (linked servers).
 - Abuse of Resource-Based Constrained Delegation (RBCD) and Shadow Credentials.
 - Technical documentation at the level of a real production environment, including reporting in a professional pentest report format.
