@@ -65,4 +65,4 @@ This is an isolated lab environment, built exclusively for educational and perso
 
 ## Author
 
-Jean Pierre Miranda Torres — offensive security / red teaming practice.
+Jean Pierre Miranda Torres — Junior Penetration Tester.
