@@ -2,21 +2,21 @@
 
 ## Overview
 
-Apexfiend uses a segmented virtual network architecture designed to simulate an enterprise environment with separate infrastructure, application, data and workstation zones.
+Apexfiend uses a segmented virtual network architecture designed to simulate an enterprise environment with separate infrastructure, application, data, and workstation zones.
 
-The laboratory is deployed primarily through VirtualBox, with pfSense providing network routing, firewall enforcement and VPN-based access.
+The laboratory is deployed primarily through VirtualBox, with pfSense providing network routing, firewall enforcement, and VPN-based access.
 
 Network segmentation is a central component of the environment. Systems are distributed across separate VLANs according to their operational roles, creating boundaries that can be evaluated during internal security assessments.
 
 The architecture supports testing scenarios involving:
 
-* Network and service enumeration
-* Inter-VLAN connectivity
-* Active Directory authentication
-* Lateral movement between systems
-* Access to application and database infrastructure
-* PKI and administrative services
-* Network pivoting and segmentation controls
+- Network and service enumeration
+- Inter-VLAN connectivity
+- Active Directory authentication
+- Lateral movement between systems
+- Access to application and database infrastructure
+- PKI and administrative services
+- Network pivoting and segmentation controls
 
 The laboratory is intended to remain isolated from unrelated networks and external systems unless a specific connection is deliberately configured for a testing purpose.
 
@@ -59,7 +59,7 @@ The laboratory uses pfSense as its central gateway and firewall, connecting seve
 
 This diagram represents the functional separation of the laboratory. It is not a complete physical cabling or interface-level diagram, and it does not imply that every VLAN permits direct communication with every other VLAN.
 
-Actual connectivity is determined by the configured interfaces, routes and firewall rules.
+Actual connectivity is determined by the configured interfaces, routes, and firewall rules.
 
 ---
 
@@ -67,14 +67,14 @@ Actual connectivity is determined by the configured interfaces, routes and firew
 
 The laboratory uses the following functional VLAN assignments.
 
-| Segment | Network / Role                   | Known systems                                                |
-| ------- | -------------------------------- | -------------------------------------------------------------|
-| VLAN 10 | Root Active Directory            | DC01                                                         |
-| VLAN 20 | Corporate Active Directory       | DC02, DC03                                                   |
-| VLAN 30 | Web infrastructure DMZ           | WEB01, WEB02                                                 |
-| VLAN 40 | Corporate Applications and Data  | Gitea, WEB03, mail,database-related systems and applications |
-| VLAN 50 | PKI infrastructure               | CA01                                                         |
-| VLAN 60 | Workstations and internal access | WK01, WK03, WK04                                             |
+| Segment | Network / Role | Known systems |
+|---|---|---|
+| VLAN 10 | Root Active Directory | DC01 |
+| VLAN 20 | Corporate Active Directory | DC02, DC03 |
+| VLAN 30 | Web infrastructure DMZ | WEB01, WEB02 |
+| VLAN 40 | Corporate Applications and Data | Gitea, WEB03, mail, database-related systems and applications |
+| VLAN 50 | PKI infrastructure | CA01 |
+| VLAN 60 | Workstations and internal access | WK01, WK03, WK04 |
 
 The VLAN identifiers describe the logical segmentation. Exact subnet assignments should be confirmed against the current VirtualBox and pfSense configuration before being treated as authoritative.
 
@@ -106,7 +106,7 @@ Domain: corp.apexfiend.lab
 
 DC02 provides PDC and DNS functionality. DC03 provides Global Catalog and DNS functionality.
 
-The segment supports corporate-domain authentication, directory services and DNS resolution.
+The segment supports corporate-domain authentication, directory services, and DNS resolution.
 
 ### VLAN 30 — Web Infrastructure
 
@@ -133,7 +133,7 @@ Known systems and services include:
 
 - WEB03
 - Gitea
-- mail01
+- MAIL01
 - SQL-related infrastructure and application dependencies
 
 WEB03 hosts Mattermost and osTicket and is part of the corporate environment.
@@ -170,7 +170,6 @@ VLAN 60 contains five Windows workstations used for different corporate roles.
 | WK05 | `172.16.60.105` | Help Desk L1 workstation |
 
 The VPN network is `10.0.200.0/24`. VPN clients use this network to obtain controlled access to the internal environment according to the configured routing and firewall policies.
-```
 
 ---
 
@@ -203,17 +202,17 @@ pfSense acts as the central routing and firewall component.
 
 Its responsibilities include:
 
-* Routing traffic between configured network segments
-* Enforcing inter-VLAN firewall rules
-* Providing VPN-based access
-* Restricting access to sensitive infrastructure
-* Supporting controlled connectivity between applications and their dependencies
+- Routing traffic between configured network segments
+- Enforcing inter-VLAN firewall rules
+- Providing VPN-based access
+- Restricting access to sensitive infrastructure
+- Supporting controlled connectivity between applications and their dependencies
 
 The presence of a route between two networks does not necessarily mean that traffic is permitted between them.
 
 The effective connectivity model depends on both routing and firewall policy.
 
-Specific permitted flows, blocked connections and associated validation results are documented in `firewall-and-routing.md`.
+Specific permitted flows, blocked connections, and associated validation results are documented in `firewall-and-routing.md`.
 
 ---
 
@@ -238,19 +237,19 @@ The exact domain trust configuration and relevant directory permissions are docu
 
 ## Application and Data Flows
 
-The laboratory includes dependencies between web applications, databases, collaboration services and administrative infrastructure.
+The laboratory includes dependencies between web applications, databases, collaboration services, and administrative infrastructure.
 
 The primary systems of interest include:
 
-* WEB01, WEB02 and WEB03
-* Gitea
-* MSSQL01 and MSSQL02
-* MAIL01
-* CA01
-* Jenkins infrastructure
-* Windows workstations
+- WEB01, WEB02, and WEB03
+- Gitea
+- MSSQL01 and MSSQL02
+- MAIL01
+- CA01
+- Jenkins infrastructure
+- Windows workstations
 
-These dependencies are relevant to internal security testing because application access, service authentication and network reachability can combine to create paths between otherwise separate systems.
+These dependencies are relevant to internal security testing because application access, service authentication, and network reachability can combine to create paths between otherwise separate systems.
 
 Not every potential communication path is assumed to be permitted. Each dependency must be checked against the actual service configuration and firewall policy.
 
@@ -260,7 +259,7 @@ Detailed service relationships are documented in `infrastructure-dependencies.md
 
 ## Security Design Considerations
 
-The network architecture is intended to support the evaluation of the following controls:
+The network architecture is intended to support the evaluation of the following controls.
 
 ### Segmentation
 
@@ -268,7 +267,7 @@ Different infrastructure roles are placed in separate logical network segments r
 
 ### Restricted access to sensitive systems
 
-Domain controllers, PKI infrastructure and database servers should be reachable only from the systems and services that require access.
+Domain controllers, PKI infrastructure, and database servers should be reachable only from the systems and services that require access.
 
 ### Controlled initial access
 
@@ -292,16 +291,16 @@ Network validation should be performed progressively as the laboratory evolves.
 
 Relevant checks include:
 
-* Confirming interface assignments and subnet masks
-* Verifying IP addressing and default gateways
-* Testing DNS resolution
-* Checking domain-controller connectivity
-* Testing required application-to-database connections
-* Confirming VPN routing
-* Verifying permitted and blocked inter-VLAN traffic
-* Confirming that external access is restricted as intended
+- Confirming interface assignments and subnet masks
+- Verifying IP addressing and default gateways
+- Testing DNS resolution
+- Checking domain-controller connectivity
+- Testing required application-to-database connections
+- Confirming VPN routing
+- Verifying permitted and blocked inter-VLAN traffic
+- Confirming that external access is restricted as intended
 
-Validation results should record the source, destination, protocol, expected behavior and observed result.
+Validation results should record the source, destination, protocol, expected behavior, and observed result.
 
 This distinction helps separate the intended network design from the effective configuration.
 
@@ -309,9 +308,10 @@ This distinction helps separate the intended network design from the effective c
 
 ## Related Documentation
 
-* `lab-setup.md` — General laboratory setup
-* `system-inventory.md` — Known systems and their roles
-* `firewall-and-routing.md` — Routing and firewall behavior
-* `infrastructure-dependencies.md` — Dependencies between services
-* `trust-boundaries.md` — Security boundaries and their implications
-* `02-active-directory/` — Active Directory architecture and configuration
+- `lab-setup.md` — General laboratory setup
+- `system-inventory.md` — Known systems and their roles
+- `firewall-and-routing.md` — Routing and firewall behavior
+- `infrastructure-dependencies.md` — Dependencies between services
+- `trust-boundaries.md` — Security boundaries and their implications
+- `architecture-diagrams.md` — Definitive diagrams referenced throughout this document
+- `02-active-directory/` — Active Directory architecture and configuration
