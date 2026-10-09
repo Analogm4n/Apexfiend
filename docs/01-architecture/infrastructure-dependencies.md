@@ -1,4 +1,4 @@
-# Infrastructure Dependencies
+# Apexfiend — Infrastructure Dependencies
 
 ## 1. Purpose
 
@@ -24,12 +24,12 @@ These layers are related, but they do not all have the same trust level or admin
 
 ## 3. Network and Remote Access Dependencies
 
-| Component                  | Depends on                             | Purpose                                        |
-| -------------------------- | -------------------------------------- | ---------------------------------------------- |
-| Internal network segments  | pfSense and configured routes          | Inter-network connectivity and traffic control |
-| VPN clients                | VPN configuration and permitted routes | Remote access to authorized lab resources      |
-| Internal clients           | DNS and network reachability           | Resolve hostnames and access services          |
-| Cross-segment applications | Applicable firewall rules and routes   | Reach required services in other VLANs         |
+| Component | Depends on | Purpose |
+|---|---|---|
+| Internal network segments | pfSense and configured routes | Inter-network connectivity and traffic control |
+| VPN clients | VPN configuration and permitted routes | Remote access to authorized lab resources |
+| Internal clients | DNS and network reachability | Resolve hostnames and access services |
+| Cross-segment applications | Applicable firewall rules and routes | Reach required services in other VLANs |
 
 The availability of a route does not guarantee that a connection succeeds. Firewall rules, service listeners, host firewalls, and authentication controls can all affect connectivity.
 
@@ -39,20 +39,20 @@ The availability of a route does not guarantee that a connection succeeds. Firew
 
 The Active Directory forest uses the root domain `apexfiend.lab` and the child domain `corp.apexfiend.lab`.
 
-| Component | Address         | Role                                                        |
-| --------- | --------------- | ----------------------------------------------------------- |
-| DC01      | `192.168.10.10` | Root-domain domain controller                               |
-| DC02      | `172.16.20.100` | Corporate-domain domain controller, PDC emulator, and DNS   |
-| DC03      | `172.16.20.101` | Corporate-domain domain controller, global catalog, and DNS |
+| Component | Address | Role |
+|---|---|---|
+| DC01 | `192.168.10.10` | Root-domain domain controller |
+| DC02 | `172.16.20.100` | Corporate-domain domain controller, PDC emulator, and DNS |
+| DC03 | `172.16.20.101` | Corporate-domain domain controller, global catalog, and DNS |
 
 The root and corporate domains rely on the configured Active Directory topology and name-resolution settings for the operations that span their respective environments.
 
 ### 4.2 Dependency Relationships
 
-* Domain-joined workstations depend on appropriate DNS configuration and network access to their domain services.
-* Authentication and directory operations depend on reachable domain controllers and the required protocols.
-* Services using LDAP depend on the configured directory endpoint, search base, bind identity, and access permissions.
-* Forest-wide operations depend on the relevant domain and trust configuration.
+- Domain-joined workstations depend on appropriate DNS configuration and network access to their domain services.
+- Authentication and directory operations depend on reachable domain controllers and the required protocols.
+- Services using LDAP depend on the configured directory endpoint, search base, bind identity, and access permissions.
+- Forest-wide operations depend on the relevant domain and trust configuration.
 
 The exact DNS forwarding, conditional forwarding, replication, and trust settings should be documented from the active configuration.
 
@@ -60,11 +60,11 @@ The exact DNS forwarding, conditional forwarding, replication, and trust setting
 
 ### 5.1 Web Systems
 
-| Component | Network                          | Domain status                | Architectural role        |
-| --------- | -------------------------------- | ---------------------------- | ------------------------- |
-| WEB01     | VLAN 30 — DMZ                    | Not domain-joined            | DMZ web system            |
-| WEB02     | VLAN 30 — DMZ                    | Not domain-joined            | DMZ web system            |
-| WEB03     | VLAN 40 — Corporate applications | Corporate domain environment | Internal application host |
+| Component | Network | Domain status | Architectural role |
+|---|---|---|---|
+| WEB01 | VLAN 30 — DMZ | Not domain-joined | DMZ web system |
+| WEB02 | VLAN 30 — DMZ | Not domain-joined | DMZ web system |
+| WEB03 | VLAN 40 — Corporate applications | Corporate domain environment | Internal application host |
 
 WEB01 and WEB02 are separate from the corporate domain environment. WEB03 resides in the corporate applications network and hosts internal collaboration and support services.
 
@@ -80,8 +80,8 @@ Its dependencies include network access to the service and the authentication an
 
 Mattermost and osTicket are hosted on WEB03 (`172.16.40.102`).
 
-* **Mattermost** provides team communication and can contain operational context shared between departments.
-* **osTicket** provides a support-ticket workflow and can contain information associated with help-desk activity.
+- **Mattermost** provides team communication and can contain operational context shared between departments.
+- **osTicket** provides a support-ticket workflow and can contain information associated with help-desk activity.
 
 Their availability depends on WEB03 and the services supporting each application. Any mail notifications, directory authentication, database connections, or other integrations should be recorded according to the deployed configuration.
 
@@ -91,10 +91,10 @@ Information exposed through collaboration and support platforms can be relevant 
 
 Apexfiend includes two SQL Server 2022 Developer Edition instances:
 
-| Component | Address      | Known role          |
-| --------- | ------------ | ------------------- |
-| MSSQL01   | Not recorded | Hosts RecruitmentDB |
-| MSSQL02   | Not recorded | Hosts ReportingDB   |
+| Component | Address | Known role |
+|---|---|---|
+| MSSQL01 | Not recorded | Hosts RecruitmentDB |
+| MSSQL02 | Not recorded | Hosts ReportingDB |
 
 The exact IP addresses and database connectivity rules remain to be recorded.
 
@@ -104,13 +104,13 @@ Application components may depend on SQL Server for persistent data and reportin
 
 The following items are relevant to the lab's database architecture:
 
-* RecruitmentDB on MSSQL01.
-* ReportingDB on MSSQL02.
-* SQL logins and database users.
-* Stored procedures and their execution permissions.
-* Ownership and database configuration settings.
-* Service accounts and any Windows-integrated authentication.
-* Connections between database services and other application components.
+- RecruitmentDB on MSSQL01.
+- ReportingDB on MSSQL02.
+- SQL logins and database users.
+- Stored procedures and their execution permissions.
+- Ownership and database configuration settings.
+- Service accounts and any Windows-integrated authentication.
+- Connections between database services and other application components.
 
 Database ownership, execution permissions, impersonation, or trust-related configuration can affect the security boundary between a database principal and the SQL Server service context. The actual impact depends on the configuration and the privileges involved.
 
@@ -118,13 +118,13 @@ Database ownership, execution permissions, impersonation, or trust-related confi
 
 For each application-to-database relationship, record:
 
-* Source application or host.
-* Destination SQL Server instance.
-* Database and relevant objects.
-* Authentication method.
-* Account or principal used.
-* Required permissions.
-* Whether the connection has been tested.
+- Source application or host.
+- Destination SQL Server instance.
+- Database and relevant objects.
+- Authentication method.
+- Account or principal used.
+- Required permissions.
+- Whether the connection has been tested.
 
 Do not infer a dependency merely because two systems exist in the same network segment.
 
@@ -140,10 +140,10 @@ The HTTP enrollment interface at `/certsrv/` has been reachable from selected in
 
 ### 7.2 PKI-Related Dependencies
 
-* Certificate templates and their permissions are managed through the Active Directory Certificate Services configuration.
-* Enrollment depends on the template's enrollment permissions, CA configuration, and the client's ability to reach the relevant service.
-* Certificate retrieval and validation may depend on directory and certificate publication settings.
-* Administrative changes depend on the privileges assigned to the relevant identities.
+- Certificate templates and their permissions are managed through the Active Directory Certificate Services configuration.
+- Enrollment depends on the template's enrollment permissions, CA configuration, and the client's ability to reach the relevant service.
+- Certificate retrieval and validation may depend on directory and certificate publication settings.
+- Administrative changes depend on the privileges assigned to the relevant identities.
 
 The `UserTemporary` certificate template is part of the lab's PKI scenario. Its effective security impact depends on the template settings, enrollment permissions, issuance configuration, and the privileges associated with the resulting certificate.
 
@@ -151,9 +151,9 @@ The `UserTemporary` certificate template is part of the lab's PKI scenario. Its 
 
 The lab distinguishes between operational access and administrative authority:
 
-* `j.derek` performs PKI auditing and certificate-template inventory from WK03, with read-only access to template information and no intended enrollment or modification rights.
-* `m.ortega` performs Jenkins maintenance and monitoring associated with WK04 and does not have direct administrative rights over CA01.
-* `m.alvarez` is associated with Jenkins and CA01 platform administration and holds Domain Admin privileges.
+- `j.derek` performs PKI auditing and certificate-template inventory from WK03, with read-only access to template information and no intended enrollment or modification rights.
+- `m.ortega` performs Jenkins maintenance and monitoring associated with WK04 and does not have direct administrative rights over CA01.
+- `m.alvarez` is associated with Jenkins and CA01 platform administration and holds Domain Admin privileges.
 
 These role descriptions reflect the lab's intended scenario. Effective permissions should be verified against the relevant group memberships, ACLs, and service configuration.
 
@@ -163,7 +163,9 @@ MAIL01 runs Ubuntu with Postfix and Dovecot and is configured to support interna
 
 The mail environment integrates with the corporate Active Directory directory service at `172.16.20.101`. The configured LDAP search base is:
 
-`DC=corp,DC=apexfiend,DC=lab`
+```text
+DC=corp,DC=apexfiend,DC=lab
+```
 
 The mail authentication configuration uses user principal names (UPNs). An LDAP authentication test using the configured UPN-based lookup succeeded during setup.
 
@@ -177,14 +179,16 @@ The mail host's IP address should be added to this document after it has been co
 
 Jenkins is used for lab automation and maintenance workflows. The configured jobs include:
 
-* `Infrastructure-Maintenance`
-* `Certificate-Inventory`
-* `SQL-Health-Check`
-* `Backup-Verification`
+- `Infrastructure-Maintenance`
+- `Certificate-Inventory`
+- `SQL-Health-Check`
+- `Backup-Verification`
 
-The jobs use predefined PowerShell scripts through a dispatcher. The configured workspace is:
+The jobs use predefined PowerShell scripts through a build agent. The configured workspace is:
 
-`C:\ProgramData\ApexAutomation\Jenkins`
+```text
+C:\ProgramData\ApexAutomation\Jenkins
+```
 
 The worker label is `apex-automation`.
 
@@ -202,11 +206,11 @@ The effective security impact of a Jenkins job depends on the job's permissions,
 
 The automation scenario connects several areas of the lab:
 
-* Jenkins maintenance and job execution.
-* PowerShell scripts and the worker execution context.
-* Certificate inventory and PKI-related operations.
-* SQL health checks and database connectivity.
-* The `svc_automation$` identity and its configured access.
+- Jenkins maintenance and job execution.
+- PowerShell scripts and the worker execution context.
+- Certificate inventory and PKI-related operations.
+- SQL health checks and database connectivity.
+- The `svc_automation$` identity and its configured access.
 
 The exact credentials, permissions, and network access used by each job should be documented from the implementation rather than assumed from the job name.
 
@@ -214,17 +218,17 @@ The exact credentials, permissions, and network access used by each job should b
 
 The following table distinguishes known components from dependencies that still require explicit verification.
 
-| Relationship                    | Current understanding                                                  | Validation needed                                               |
-| ------------------------------- | ---------------------------------------------------------------------- | --------------------------------------------------------------- |
-| Workstations → Active Directory | Domain operations use the configured domain services                   | Confirm DNS, authentication, and required ports per workstation |
-| MAIL01 → corporate LDAP         | UPN-based LDAP authentication was tested successfully                  | Record the final bind configuration and test results            |
-| Mattermost/osTicket → WEB03     | Both applications are hosted on WEB03                                  | Record database, mail, and identity integrations, if configured |
-| Applications → SQL Server       | RecruitmentDB and ReportingDB exist on separate instances              | Map each application, account, and database connection          |
-| Internal clients → CA01         | Certificate enrollment interface was reachable from selected hosts     | Verify enrollment rights and template-specific access           |
-| Jenkins → automation worker     | Jobs use predefined PowerShell scripts and the `apex-automation` label | Confirm controller/agent topology and execution identity        |
-| Jenkins → `svc_automation$`     | gMSA is associated with `GG-Jenkins-Hosts`; configuration was tested   | Verify the exact execution context and effective permissions    |
-| DMZ → corporate services        | Separate network segments define an intended boundary                  | Test actual allowed and denied connections                      |
-| VPN → internal networks         | VPN client network is `10.0.200.0/24`                                  | Record routes, firewall policy, and accessible services         |
+| Relationship | Current understanding | Validation needed |
+|---|---|---|
+| Workstations → Active Directory | Domain operations use the configured domain services | Confirm DNS, authentication, and required ports per workstation |
+| MAIL01 → corporate LDAP | UPN-based LDAP authentication was tested successfully | Record the final bind configuration and test results |
+| Mattermost/osTicket → WEB03 | Both applications are hosted on WEB03 | Record database, mail, and identity integrations, if configured |
+| Applications → SQL Server | RecruitmentDB and ReportingDB exist on separate instances | Map each application, account, and database connection |
+| Internal clients → CA01 | Certificate enrollment interface was reachable from selected hosts | Verify enrollment rights and template-specific access |
+| Jenkins → automation worker | Jobs use predefined PowerShell scripts and the `apex-automation` label | Confirm controller/agent topology and execution identity |
+| Jenkins → `svc_automation$` | gMSA is associated with `GG-Jenkins-Hosts`; configuration was tested | Verify the exact execution context and effective permissions |
+| DMZ → corporate services | Separate network segments define an intended boundary | Test actual allowed and denied connections |
+| VPN → internal networks | VPN client network is `10.0.200.0/24` | Record routes, firewall policy, and accessible services |
 
 ## 11. Security Relevance
 
@@ -232,12 +236,12 @@ Infrastructure dependencies help explain how an initial foothold may lead to bro
 
 In Apexfiend, the intended assessment scenarios explore relationships across several security boundaries, including:
 
-* Workstation access and Active Directory enumeration.
-* Application and database access.
-* SQL Server service contexts and domain identities.
-* Certificate template configuration and enrollment permissions.
-* Jenkins job execution and automation identities.
-* Directory permissions and access to sensitive infrastructure.
+- Workstation access and Active Directory enumeration.
+- Application and database access.
+- SQL Server service contexts and domain identities.
+- Certificate template configuration and enrollment permissions.
+- Jenkins job execution and automation identities.
+- Directory permissions and access to sensitive infrastructure.
 
 These are areas of investigation, not a claim that every transition is exploitable or that the complete attack chain has been validated end to end.
 
