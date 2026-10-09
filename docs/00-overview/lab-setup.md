@@ -407,9 +407,9 @@ SQL-Health-Check
 Backup-Verification
 ```
 
-The jobs interact with local PowerShell automation through a dispatcher mechanism.
+The jobs interact with local PowerShell automation through a build agent mechanism.
 
-The dispatcher maps approved build jobs to predefined scripts rather than providing unrestricted command execution.
+The build agent maps approved build jobs to predefined scripts rather than providing unrestricted command execution.
 
 ---
 
