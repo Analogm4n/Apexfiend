@@ -1,4 +1,4 @@
-# Firewall and Routing
+# Apexfiend — Firewall and Routing
 
 ## 1. Purpose
 
@@ -18,11 +18,11 @@ pfSense connects the lab's network segments and provides the control point for t
 
 The firewall is intended to support the following functions:
 
-* Route traffic between configured internal networks when permitted.
-* Enforce access restrictions between network segments.
-* Provide the external-facing connectivity used by the lab's development workstation.
-* Support remote access through the lab VPN.
-* Restrict access to sensitive infrastructure according to the intended trust boundaries.
+- Route traffic between configured internal networks when permitted.
+- Enforce access restrictions between network segments.
+- Provide the external-facing connectivity used by the lab's development workstation.
+- Support remote access through the lab VPN.
+- Restrict access to sensitive infrastructure according to the intended trust boundaries.
 
 The presence of a network route does not imply that traffic is permitted. Actual connectivity depends on the firewall rules and service-level controls in place.
 
@@ -30,15 +30,15 @@ The presence of a network route does not imply that traffic is permitted. Actual
 
 The lab is divided into logical network segments. The following table summarizes their intended roles.
 
-| Segment                         | Network / VLAN  | Purpose                                                               |
-| ------------------------------- | --------------- | --------------------------------------------------------------------- |
-| Root Active Directory           | VLAN 10         | Root-domain domain controller and related services                    |
-| Corporate Active Directory      | VLAN 20         | Corporate-domain domain controllers and DNS                           |
-| DMZ                             | VLAN 30         | WEB01 and WEB02; external-facing or isolated web services             |
-| Corporate applications and data | VLAN 40         | WEB03, Gitea, and database infrastructure                             |
-| PKI                             | VLAN 50         | CA01 and certificate services                                         |
-| Workstations                    | VLAN 60         | User workstations and administrative or operational endpoints         |
-| VPN clients                     | `10.0.200.0/24` | Remote access into the lab, subject to VPN and firewall configuration |
+| Segment | Network / VLAN | Purpose |
+|---|---|---|
+| Root Active Directory | VLAN 10 | Root-domain domain controller and related services |
+| Corporate Active Directory | VLAN 20 | Corporate-domain domain controllers and DNS |
+| DMZ | VLAN 30 | WEB01 and WEB02; external-facing or isolated web services |
+| Corporate applications and data | VLAN 40 | WEB03, Gitea, and database infrastructure |
+| PKI | VLAN 50 | CA01 and certificate services |
+| Workstations | VLAN 60 | User workstations and administrative or operational endpoints |
+| VPN clients | `10.0.200.0/24` | Remote access into the lab, subject to VPN and firewall configuration |
 
 The exact interface addresses, subnet masks, and DHCP settings for individual segments should be recorded in the network configuration or inventory as they are confirmed.
 
@@ -56,9 +56,9 @@ Traffic from the DMZ to other segments should be limited to explicitly required 
 
 VLAN 40 contains corporate application and data services, including:
 
-* WEB03, which belongs to the corporate domain network.
-* Gitea, used for source-code and project documentation hosting.
-* SQL Server infrastructure, including MSSQL01 and MSSQL02.
+- WEB03, which belongs to the corporate domain network.
+- Gitea, used for source-code and project documentation hosting.
+- SQL Server infrastructure, including MSSQL01 and MSSQL02.
 
 These systems support application workflows and internal services. Access between them should be based on required service dependencies rather than unrestricted connectivity.
 
@@ -88,13 +88,13 @@ The intended design separates certificate infrastructure from ordinary workstati
 
 The workstation segment contains five systems with different operational roles:
 
-| Host | Address         | Role                                     |
-| ---- | --------------- | ---------------------------------------- |
-| WK01 | `172.16.60.101` | Standard corporate workstation           |
-| WK02 | `172.16.60.102` | Web development and DevOps               |
+| Host | Address | Role |
+|---|---|---|
+| WK01 | `172.16.60.101` | Standard corporate workstation |
+| WK02 | `172.16.60.102` | Web development and DevOps |
 | WK03 | `172.16.60.103` | PKI operations and certificate inventory |
-| WK04 | `172.16.60.104` | Jenkins maintenance and automation       |
-| WK05 | `172.16.60.105` | Help Desk L1                             |
+| WK04 | `172.16.60.104` | Jenkins maintenance and automation |
+| WK05 | `172.16.60.105` | Help Desk L1 |
 
 Although these systems share a network segment, their user privileges and responsibilities differ. Network placement alone does not define their effective permissions.
 
@@ -114,13 +114,13 @@ Routing determines which networks can be reached through the configured gateways
 
 The following traffic categories should be reviewed when validating the lab:
 
-* **Workstation to Active Directory:** DNS, authentication, and other domain operations required by the workstation's role.
-* **Application to database:** Connections required by application components using MSSQL01 or MSSQL02.
-* **Corporate network to PKI:** Certificate enrollment, retrieval, and administrative operations where applicable.
-* **DMZ to corporate network:** Explicitly required application traffic only.
-* **VPN to internal networks:** Access limited to the intended remote-access scope.
-* **Management traffic:** Administrative access restricted to the appropriate systems and accounts.
-* **Inter-domain traffic:** Connectivity required by the root and corporate Active Directory environments.
+- **Workstation to Active Directory:** DNS, authentication, and other domain operations required by the workstation's role.
+- **Application to database:** Connections required by application components using MSSQL01 or MSSQL02.
+- **Corporate network to PKI:** Certificate enrollment, retrieval, and administrative operations where applicable.
+- **DMZ to corporate network:** Explicitly required application traffic only.
+- **VPN to internal networks:** Access limited to the intended remote-access scope.
+- **Management traffic:** Administrative access restricted to the appropriate systems and accounts.
+- **Inter-domain traffic:** Connectivity required by the root and corporate Active Directory environments.
 
 These categories describe validation targets, not a claim that a particular rule currently exists.
 
@@ -128,15 +128,15 @@ These categories describe validation targets, not a claim that a particular rule
 
 The following checks can be used to document and verify the implementation:
 
-* [ ] Record each pfSense interface, VLAN, subnet, and gateway.
-* [ ] Export or document the active firewall rules for each interface.
-* [ ] Confirm which internal networks are reachable from the VPN.
-* [ ] Verify whether DMZ hosts can initiate connections to corporate application and data networks.
-* [ ] Test the required application-to-database connections.
-* [ ] Verify required Active Directory and DNS communication between domain controllers and clients.
-* [ ] Confirm which systems can access CA01 and certificate enrollment services.
-* [ ] Review management access to servers and network infrastructure.
-* [ ] Record observed results and any deviations from the intended policy.
+- [ ] Record each pfSense interface, VLAN, subnet, and gateway.
+- [ ] Export or document the active firewall rules for each interface.
+- [ ] Confirm which internal networks are reachable from the VPN.
+- [ ] Verify whether DMZ hosts can initiate connections to corporate application and data networks.
+- [ ] Test the required application-to-database connections.
+- [ ] Verify required Active Directory and DNS communication between domain controllers and clients.
+- [ ] Confirm which systems can access CA01 and certificate enrollment services.
+- [ ] Review management access to servers and network infrastructure.
+- [ ] Record observed results and any deviations from the intended policy.
 
 Testing should be performed from authorized lab systems and documented with the source, destination, protocol, port, and observed result.
 
