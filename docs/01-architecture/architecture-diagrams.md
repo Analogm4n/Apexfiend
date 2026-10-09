@@ -1,4 +1,4 @@
-# Architecture Diagrams
+# Apexfiend — Architecture Diagrams
 
 ## 1. Purpose
 
@@ -6,11 +6,11 @@ This document provides visual representations of the Apexfiend architecture usin
 
 The diagrams summarize the network segments, Active Directory structure, major infrastructure dependencies, and selected security boundaries. They are intended to complement the detailed descriptions in:
 
-* `network-architecture.md`
-* `system-inventory.md`
-* `firewall-and-routing.md`
-* `infrastructure-dependencies.md`
-* `trust-boundaries.md`
+- `network-architecture.md`
+- `system-inventory.md`
+- `firewall-and-routing.md`
+- `infrastructure-dependencies.md`
+- `trust-boundaries.md`
 
 The diagrams represent the documented design. A connection between components indicates an architectural relationship or potential dependency, not necessarily unrestricted network access or a fully validated attack path.
 
@@ -80,10 +80,10 @@ flowchart TB
 
 **Diagram notes**
 
-* VLANs are shown as logical segments connected through the firewall. The diagram does not imply that every segment can communicate freely with every other segment.
-* The exact attachment of MAIL01 and Jenkins to their network interfaces should be updated if their final placement differs from the current design.
-* Server addresses marked as not recorded should be filled in after verification.
-* The VPN relationship represents remote access at an architectural level; the actual client routes and firewall permissions must be checked separately.
+- VLANs are shown as logical segments connected through the firewall. The diagram does not imply that every segment can communicate freely with every other segment.
+- The exact attachment of MAIL01 and Jenkins to their network interfaces should be updated if their final placement differs from the current design.
+- Server addresses marked as not recorded should be filled in after verification.
+- The VPN relationship represents remote access at an architectural level; the actual client routes and firewall permissions must be checked separately.
 
 ## 3. Active Directory and Identity Structure
 
@@ -118,10 +118,10 @@ flowchart TB
 
 **Diagram notes**
 
-* DC01 belongs to the root domain. DC02 and DC03 belong to the corporate child domain.
-* The diagram indicates domain placement, not the exact replication, trust, or authentication traffic.
-* WEB01 and WEB02 are intentionally omitted from the domain-membership relationships because they are not domain-joined.
-* The effective privileges of users and service accounts depend on their actual memberships and permissions.
+- DC01 belongs to the root domain. DC02 and DC03 belong to the corporate child domain.
+- The diagram indicates domain placement, not the exact replication, trust, or authentication traffic.
+- WEB01 and WEB02 are intentionally omitted from the domain-membership relationships because they are not domain-joined.
+- The effective privileges of users and service accounts depend on their actual memberships and permissions.
 
 ## 4. Application and Service Dependencies
 
@@ -165,10 +165,10 @@ flowchart LR
 
 **Diagram notes**
 
-* The LDAP relationship between MAIL01 and Active Directory was tested during setup.
-* Mattermost and osTicket are hosted on WEB03. Their additional database, mail, or directory integrations should be confirmed from the deployed configuration.
-* Jenkins includes jobs for certificate inventory and SQL health checks. The actual targets, execution identities, and required permissions should be confirmed from the job definitions and scripts.
-* The diagram does not imply that the gMSA has administrative rights over the CA or SQL Server.
+- The LDAP relationship between MAIL01 and Active Directory was tested during setup.
+- Mattermost and osTicket are hosted on WEB03. Their additional database, mail, or directory integrations should be confirmed from the deployed configuration.
+- Jenkins includes jobs for certificate inventory and SQL health checks. The actual targets, execution identities, and required permissions should be confirmed from the job definitions and scripts.
+- The diagram does not imply that the gMSA has administrative rights over the CA or SQL Server.
 
 ## 5. Security Boundary Overview
 
@@ -220,10 +220,10 @@ flowchart TB
 
 **Diagram notes**
 
-* The DMZ, corporate environment, Active Directory, and privileged infrastructure are separate security contexts.
-* Dashed lines denote conceptual or conditional relationships, not verified firewall permissions.
-* The diagram intentionally does not show a direct route from every lower-trust component to every higher-trust component.
-* A valid security assessment should establish the exact conditions required to cross each boundary.
+- The DMZ, corporate environment, Active Directory, and privileged infrastructure are separate security contexts.
+- Dashed lines denote conceptual or conditional relationships, not verified firewall permissions.
+- The diagram intentionally does not show a direct route from every lower-trust component to every higher-trust component.
+- A valid security assessment should establish the exact conditions required to cross each boundary.
 
 ## 6. High-Level Assessment Path
 
@@ -244,6 +244,7 @@ flowchart TD
     DIRECTORY["Directory Permission Assessment"]
     CA01["CA01 / Critical Infrastructure"]
     IMPACT["Potential Privileged Impact"]
+    FOREST["Forest Root Compromise<br/>ExtraSid: DC02$ → DC01$"]
 
     ENTRY --> ENUM
     ENUM --> APPS
@@ -257,28 +258,32 @@ flowchart TD
     GMSA --> DIRECTORY
     DIRECTORY --> CA01
     CA01 --> IMPACT
+    IMPACT --> FOREST
 
     classDef unverified stroke-dasharray: 5 5
-    class ENTRY,ENUM,APPS,DB,SQLCTX,PKIUSER,ADCS,OPS,JENKINS,GMSA,DIRECTORY,CA01,IMPACT unverified
+    classDef validated stroke-width: 2px
+    class ADCS,OPS,DIRECTORY,CA01,IMPACT,FOREST unverified
+    class ENTRY,ENUM,APPS,DB,SQLCTX,PKIUSER,JENKINS,GMSA validated
 ```
 
 **Diagram notes**
 
-* Dashed styling indicates that the diagram is a conceptual scenario requiring validation, not that every step has been proven.
-* The exact transition conditions, evidence, and status of each step belong in `attack-path.md`.
-* Do not publish credentials, tokens, hashes, private keys, or other reusable authentication material in these diagrams or their supporting documentation.
-* Update the diagram if testing changes the order of the path or shows that a transition is not viable.
+- Dashed nodes (`ADCS`, `OPS`, `DIRECTORY`, `CA01`, `IMPACT`, `FOREST`) represent stages marked as Designed or In development in `attack-path.md` — the conceptual scenario still pending end-to-end validation. Solid nodes (`ENTRY`, `ENUM`, `APPS`, `DB`, `SQLCTX`, `PKIUSER`, `JENKINS`, `GMSA`) represent stages marked as Implemented or Tested.
+- `FOREST` represents Stage 15 of `attack-path.md`: SID History (ExtraSid) abuse extending compromise from the corporate child domain (`DC02$`, `corp.apexfiend.lab`) to the forest root (`DC01$`, `apexfiend.lab`).
+- The exact transition conditions, evidence, and status of each step belong in `attack-path.md`.
+- Do not publish credentials, tokens, hashes, private keys, or other reusable authentication material in these diagrams or their supporting documentation.
+- Update the diagram if testing changes the order of the path or shows that a transition is not viable.
 
 ## 7. Diagram Maintenance
 
 When updating these diagrams:
 
-* Keep hostnames, domain names, VLAN assignments, and confirmed IP addresses consistent with `system-inventory.md`.
-* Mark unconfirmed addresses as `IP not recorded` rather than guessing.
-* Distinguish domain membership from mere network connectivity.
-* Use dashed lines for conceptual, conditional, or unverified relationships.
-* Avoid representing a possible attack path as a confirmed path unless evidence supports it.
-* Update the dependency diagrams when application integrations or automation jobs change.
-* Keep detailed firewall rules and service-specific permissions in their respective documentation.
+- Keep hostnames, domain names, VLAN assignments, and confirmed IP addresses consistent with `system-inventory.md`.
+- Mark unconfirmed addresses as `IP not recorded` rather than guessing.
+- Distinguish domain membership from mere network connectivity.
+- Use dashed lines for conceptual, conditional, or unverified relationships.
+- Avoid representing a possible attack path as a confirmed path unless evidence supports it.
+- Update the dependency diagrams when application integrations or automation jobs change.
+- Keep detailed firewall rules and service-specific permissions in their respective documentation.
 
 Mermaid source should remain in the Markdown files so that diagrams can be reviewed and version-controlled alongside the architecture documentation.
