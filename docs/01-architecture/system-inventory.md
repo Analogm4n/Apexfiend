@@ -200,7 +200,7 @@ SQL-Health-Check
 Backup-Verification
 ```
 
-Jobs interact with predefined PowerShell scripts through a dispatcher mechanism.
+Jobs interact with predefined PowerShell scripts through a build agent mechanism.
 
 The automation workspace is:
 
@@ -256,7 +256,7 @@ Some components are logical services or software deployments rather than indepen
 | Dovecot | MAIL01 | Mail access and authentication | Implemented |
 | LDAP integration | MAIL01 / Active Directory | Directory-backed mail authentication | Tested |
 | Certificate inventory tooling | SQL / PKI infrastructure | Collect certificate and template information | Implemented; workflow tested |
-| Jenkins PowerShell dispatcher | Jenkins host | Map approved jobs to predefined scripts | Implemented; job execution tested |
+| Jenkins PowerShell build agent | Jenkins host | Map approved jobs to predefined scripts | Implemented; job execution tested |
 
 This section should be updated when new services are added or existing components are moved between hosts.
 
