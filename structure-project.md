@@ -22,9 +22,9 @@ Apexfiend/
 
 │   │   ├── scope.md
 
-│   │   ├── lab-setup.md                  
+│   │   ├── lab-setup.md
 
-│   │   └── attack-path.md                
+│   │   └── attack-path.md
 
 │   │
 
