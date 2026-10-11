@@ -1,4 +1,4 @@
-# Apexfiend — pfSense
+# Apexfiend — pfSense(document incomplete at this moment...)
 
 ## 1. Purpose
 
@@ -87,6 +87,8 @@ Each VLAN's rules are evaluated top-down; the first match wins. Rules below are 
 | 1 | **Pass → any** (enabled) |
 | 2 | Block → any (final) — **disabled** |
 
+**⚠️ Verified finding — contradicts intended design.** The permissive rule is enabled and evaluated first; the restrictive final block is present in the configuration but disabled. As configured, DMZ hosts (WEB01, WEB02) currently have **unrestricted outbound access to every other segment**, including the corporate Active Directory, application, and PKI networks. This directly contradicts the DMZ isolation model described in `segmentation.md`, Section 2, and `01-architecture/trust-boundaries.md`, Section 3.2.
+
 ### VLAN 40 (Corporate Applications and Data)
 
 | Order | Rule |
@@ -97,6 +99,8 @@ Each VLAN's rules are evaluated top-down; the first match wins. Rules below are 
 | 4 | Pass → VLAN 90 — *"Kali testing"* |
 | 5 | Pass → VLAN 40 (self) |
 | 6 | Block → any (final) — **disabled** |
+
+**⚠️ Verified finding — contradicts intended design.** As with VLAN 30, the broad allow rule is first and enabled, and the final block is disabled. The more specific rules below it (to VLAN 30, VLAN 20, VLAN 90) are redundant given the broad allow already matches first. VLAN 40 currently has unrestricted outbound access.
 
 ### VLAN 50 (PKI / Automation — CA01, JENKINS01)
 
@@ -110,6 +114,7 @@ Each VLAN's rules are evaluated top-down; the first match wins. Rules below are 
 | 6 | Pass → VLAN 20 |
 | 7 | Block → any (final) — **disabled** |
 
+**⚠️ Verified finding — contradicts intended design.** Same pattern as VLAN 30 and VLAN 40: the broad allow rule is enabled and matches first, and the restrictive final block exists but is disabled. VLAN 50 — which hosts `CA01` and `JENKINS01` — currently has unrestricted outbound access.
 
 ### VLAN 60 (Workstations)
 

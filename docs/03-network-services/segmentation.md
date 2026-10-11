@@ -59,21 +59,39 @@ These follow directly from the dependencies already documented in `01-architectu
 | `10.0.200.0/24` (VPN clients) | VLAN 60 (workstations) | Permitted, per the VPN's intended role as the remote-access entry point |
 | `10.0.200.0/24` (VPN clients) | All other VLANs | Not permitted directly — VPN clients reach other segments only by first reaching a workstation or jumping through an application, not via a flat route to every VLAN |
 
-## 5. Validation Status
+## 5. Verified Findings (from `pfsense.md`)
+
+The live firewall configuration has now been reviewed (see `pfsense.md`, Sections 6–7). Results differ by segment:
+
+| Segment | Result |
+|---|---|
+| VLAN 10 → VLAN 20/40 only, blocked otherwise | **Verified — matches intended design** |
+| VLAN 20 → all domain-joined segments, blocked otherwise | **Verified — matches intended design** |
+| VLAN 60 (workstations) → restricted set, blocked otherwise | **Verified — matches intended design** |
+| VPN clients restricted to VLAN 60 | **Verified — enforced via pushed OpenVPN route, not a firewall rule** |
+| **VLAN 30 (DMZ) egress restricted to 80/443** | **Does not match — unrestricted egress currently configured; the restrictive rule exists but is disabled** |
+| **VLAN 40 egress restricted to documented dependencies** | **Does not match — unrestricted egress currently configured; the restrictive rule exists but is disabled** |
+| **VLAN 50 (CA01, JENKINS01) egress restricted to documented dependencies** | **Does not match — unrestricted egress currently configured; the restrictive rule exists but is disabled** |
+
+The DMZ, VLAN 40, and VLAN 50 findings are genuine current-state misconfigurations relative to the design intent recorded in this document and in `01-architecture/trust-boundaries.md` — not an intentional attack-path feature. They are retained here as real findings; see `pfsense.md` for the underlying rule-by-rule detail.
+
+## 6. Validation Status
 
 | Rule | Status |
 |---|---|
-| DMZ egress restricted to 80/443 | Assumed (design intent) — not yet independently tested |
-| DMZ has no route to corporate segments | Assumed — not yet independently tested; firewall rules between some VLANs are still being configured |
-| Domain-joined segments restricted to standard AD ports against DC01/DC02/DC03 | Assumed — not yet independently tested |
-| VPN clients restricted to VLAN 60 only | Assumed — not yet independently tested |
-| Other inter-VLAN rules (Section 4) | Assumed — not yet independently tested |
+| VLAN 10 and VLAN 20 segmentation | Verified — matches design |
+| VLAN 60 segmentation | Verified — matches design |
+| VPN client restriction to VLAN 60 | Verified — matches design (route-based) |
+| DMZ egress restricted to 80/443 | Verified — **does not match**; currently unrestricted |
+| VLAN 40 egress restriction | Verified — **does not match**; currently unrestricted |
+| VLAN 50 egress restriction | Verified — **does not match**; currently unrestricted |
+| Remaining application-specific rules in Section 4 not covered above | Not yet individually tested |
 
-None of the rules in this document should be treated as confirmed until tested with the source/destination/port methodology described in `01-architecture/firewall-and-routing.md`, Section 8. This document will be updated — rule by rule, not as a single pass — as the firewall configuration is completed and each rule is verified.
+## 7. Related Documentation
 
-## 6. Related Documentation
-
-- `pfsense.md` — Actual configured firewall rules, once exported
+- `pfsense.md` — Verified firewall rules this section is derived from
+- `dns.md` — DNS configuration for the hosts referenced throughout this document
+- `vpn-config.md` — OpenVPN configuration detail
 - `01-architecture/firewall-and-routing.md` — Validation checklist and traffic categories this document assumes
 - `01-architecture/infrastructure-dependencies.md` — Source of the application-level dependencies behind Section 4
-- `01-architecture/trust-boundaries.md` — Security rationale for each boundary assumed here
+- `01-architecture/trust-boundaries.md` — Security rationale undermined by the Section 5 findings
