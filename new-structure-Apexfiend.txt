@@ -1,0 +1,103 @@
+Apexfiend/
+├── README.md
+├── CHANGELOG.md
+├── LICENSE
+├── .gitignore
+│
+├── docs/
+│   ├── 00-overview/              ✅ completo
+│   │   ├── project-overview.md
+│   │   ├── objectives.md
+│   │   ├── scope.md
+│   │   ├── lab-setup.md
+│   │   └── attack-path.md
+│   │
+│   ├── 01-architecture/          ✅ completo
+│   │   ├── network-architecture.md
+│   │   ├── system-inventory.md
+│   │   ├── firewall-and-routing.md
+│   │   ├── infrastructure-dependencies.md
+│   │   ├── trust-boundaries.md
+│   │   └── architecture-diagrams.md
+│   │
+│   ├── 02-active-directory/      ✅ completo
+│   │   ├── domains.md
+│   │   ├── organizational-units.md
+│   │   ├── users-and-groups.md
+│   │   ├── delegated-permissions.md
+│   │   ├── kerberos.md
+│   │   └── acl-design.md
+│   │
+│   ├── 03-network-services/      ✅ completo
+│   │   ├── pfsense.md
+│   │   ├── dns.md
+│   │   ├── vpn.md
+│   │   └── segmentation.md
+│   │
+│   ├── 04-web-and-collaboration/ ✅ completo
+│   │   ├── web01.md
+│   │   ├── gitea.md
+│   │   ├── web02.md
+│   │   ├── web03.md
+│   │   └── mail.md
+│   │
+│   ├── 05-databases/             ⬜ pendiente
+│   │   ├── sql-architecture.md
+│   │   ├── mssql01.md
+│   │   ├── mssql02.md
+│   │   ├── recruitmentdb.md
+│   │   ├── reportingdb.md
+│   │   └── sql-trust-boundaries.md
+│   │
+│   ├── 06-pki/                   ⬜ pendiente
+│   │   ├── adcs-architecture.md
+│   │   ├── ca01.md
+│   │   ├── certificate-templates.md
+│   │   └── certificate-inventory.md
+│   │
+│   ├── 07-jenkins/                ⬜ pendiente
+│   │   ├── architecture.md
+│   │   ├── jobs.md
+│   │   ├── build-agent.md
+│   │   ├── gmsa.md
+│   │   └── automation-worker.md
+│   │
+│   ├── 08-attack-paths/          ⬜ pendiente
+│   │   ├── initial-access.md
+│   │   ├── web-to-vpn.md
+│   │   ├── sql-path.md
+│   │   ├── pki-path.md
+│   │   ├── jenkins-path.md
+│   │   ├── rbcd-path.md
+│   │   └── full-attack-chain.md
+│   │
+│   ├── 09-reporting/             ⬜ pendiente
+│   │   ├── executive-summary.md
+│   │   ├── findings.md
+│   │   ├── remediation.md
+│   │   └── lessons-learned.md
+│   │
+│   └── 10-development-log/       ⬜ pendiente
+│       ├── milestones.md
+│       └── decisions.md
+│
+├── lab/
+│   ├── diagrams/
+│   ├── configs/
+│   ├── scripts/
+│   │   ├── powershell/
+│   │   ├── sql/
+│   │   ├── ldap/
+│   │   └── automation/
+│   └── vm-templates/
+│
+├── writeups/
+│   ├── enumeration/
+│   ├── exploitation/
+│   ├── lateral-movement/
+│   ├── privilege-escalation/
+│   └── post-exploitation/
+│
+└── evidence/
+    ├── screenshots/
+    └── sanitized-output/
