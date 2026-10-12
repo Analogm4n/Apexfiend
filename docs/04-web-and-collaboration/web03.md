@@ -85,16 +85,15 @@ sssd_nss, sssd_pam, sssd_pac
 
 **Confirms `WEB03` is domain-joined to `corp.apexfiend.lab` via SSSD** (System Security Services Daemon) — the standard mechanism for Linux hosts to authenticate against Active Directory. This matches the domain-membership status already recorded in `01-architecture/network-architecture.md` and `infrastructure-dependencies.md`. The presence of `sssd_pac` specifically indicates Kerberos PAC (Privilege Attribute Certificate) processing is active, meaning domain users' group memberships are available locally on this host for authorization decisions (e.g., SSH access, `sudo` rules) — relevant to any attack-path step that assumes a domain identity can log into `WEB03` directly.
 
-## 7. Open Items — Need Clarification
+## 7. osTicket Mail Integration
 
-Two things turned up in `ps aux` and `ss -tuln` that are not yet accounted for in the lab's documented design:
+**Postfix and Dovecot running on `WEB03` itself are part of osTicket's own mail integration** — they handle inbound ticket creation/updates via email, and support osTicket's connection to Mattermost (e.g., posting ticket notifications into a channel). This is local to osTicket's function on this host and is independent of `MAIL01`, the dedicated corporate mail server; the two should not be conflated.
 
-1. **Postfix and Dovecot are running on `WEB03` itself** (`/usr/lib/postfix/sbin/master`, `/usr/sbin/dovecot`, with IMAP/IMAPS listening on `143`/`993`). This is unexpected — `MAIL01` was documented as the dedicated corporate mail server. Is this a local mail stack with its own purpose on `WEB03` (e.g., piping osTicket ticket notifications, or local-only system mail), or does it indicate `WEB03` plays a larger role in mail handling than currently documented?
-2. **An unidentified service on port 8443** (both TCP on `0.0.0.0:8443`/`127.0.0.1:8443` and UDP on `172.16.40.103:8443`) does not map to any process confirmed in the `ps aux` capture. What is this?
+## 8. Open Item — Unidentified Service on Port 8443
 
-Both are left unresolved in this document pending clarification, rather than guessed at.
+A service on port 8443 (TCP on `0.0.0.0:8443` and `127.0.0.1:8443`, and UDP on `172.16.40.103:8443`) does not map to any process confirmed in the `ps aux` capture. It may be related to Dovecot or Postfix (an alternate submission/management port) given their presence on this host, but this has not been confirmed. Left unresolved pending further investigation rather than guessed at.
 
-## 8. Listening Ports Summary
+## 9. Listening Ports Summary
 
 ```powershell
 ss -tuln
@@ -109,9 +108,9 @@ ss -tuln
 | 8065 | `127.0.0.1` | Mattermost |
 | 8080 | `127.0.0.1` | Apache2 — portal |
 | 8081 | `127.0.0.1` | Apache2 — osTicket |
-| 8443 | `0.0.0.0`, `127.0.0.1` (TCP+UDP) | Unidentified — see Section 7 |
+| 8443 | `0.0.0.0`, `127.0.0.1` (TCP+UDP) | Unidentified — see Section 8 |
 
-## 9. Validation Status
+## 10. Validation Status
 
 | Item | Status |
 |---|---|
@@ -120,11 +119,11 @@ ss -tuln
 | Mattermost configuration (SiteURL, listen address, registration settings) | Verified |
 | Domain integration via SSSD | Verified |
 | osTicket backend database (MariaDB) | Presumed, not independently confirmed |
-| Purpose of Postfix/Dovecot on this host | Not yet clarified |
+| Purpose of Postfix/Dovecot on this host | Verified — osTicket mail integration |
 | Service on port 8443 | Not yet identified |
 | osTicket department/queue structure | Not yet captured |
 
-## 10. Related Documentation
+## 11. Related Documentation
 
 - `osticket.md` *(pending)* — Department structure and ticket workflow detail
 - `mattermost.md` *(pending)* — Channel structure detail
