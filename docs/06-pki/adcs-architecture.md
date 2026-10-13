@@ -27,7 +27,7 @@ Published templates fall into two categories (`ca02.md`, Section 5):
 
 ## 4. Web Enrollment (HTTP)
 
-ESC8 requires the CA to expose an HTTP enrollment endpoint (`/certsrv/`, the Certificate Enrollment Web Service, or similar) that can receive a relayed NTLM authentication. **Whether this role is installed and enabled on `CA02` has not yet been independently verified in this pass** — it was referenced at a design level in earlier project notes but not confirmed against the live server after the CA01 → CA02 migration. This should be checked and recorded before this section is considered complete.
+**Confirmed installed and functional.** The Web Enrollment role is present on `CA02`, and the ESC8 NTLM-relay technique has been tested end-to-end by the operator — including successful recovery of a certificate issued to `m.ortega` via the relayed request. This closes the open item from the previous revision of this document and confirms `00-overview/attack-path.md` Stage 7 as validated, not merely designed.
 
 ## 5. Certificate Inventory Tooling
 
