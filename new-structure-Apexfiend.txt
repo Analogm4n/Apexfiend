@@ -41,7 +41,7 @@ Apexfiend/
 │   │   ├── web03.md
 │   │   └── mail.md
 │   │
-│   ├── 05-databases/             ⬜ pendiente
+│   ├── 05-databases/             ✅ completo
 │   │   ├── sql-architecture.md
 │   │   ├── mssql01.md
 │   │   ├── mssql02.md
@@ -49,7 +49,7 @@ Apexfiend/
 │   │   ├── reportingdb.md
 │   │   └── sql-trust-boundaries.md
 │   │
-│   ├── 06-pki/                   ⬜ pendiente
+│   ├── 06-pki/                   ✅ completo
 │   │   ├── adcs-architecture.md
 │   │   ├── ca01.md
 │   │   ├── certificate-templates.md
