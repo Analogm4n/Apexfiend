@@ -55,7 +55,7 @@ Apexfiend/
 │   │   ├── certificate-templates.md
 │   │   └── certificate-inventory.md
 │   │
-│   ├── 07-jenkins/                ⬜ pendiente
+│   ├── 07-jenkins/                ✅ completo
 │   │   ├── architecture.md
 │   │   ├── jobs.md
 │   │   ├── build-agent.md
