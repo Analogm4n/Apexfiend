@@ -1,73 +1,96 @@
-# Apexfiend — ReportingDB (MSSQL02)
+# Apexfiend — ReportingDB (MSSQL03)
 
 ## 1. Purpose
 
-This document records the verified database-level detail for `ReportingDB`, hosted on `MSSQL02` — the database at the center of the confirmed `svc_reporting` → `sql_dba` → `sysadmin` privilege escalation chain.
+This document records the verified database-level detail for `ReportingDB`, now hosted on **`MSSQL03`** (which replaces `MSSQL02` — see `mssql03.md`). The privilege-escalation mechanism has changed from a direct `EXECUTE AS sql_dba` call to a SQL injection vulnerability; this document reflects the current, live configuration.
 
 ```text
-Server:     MSSQL02.corp.apexfiend.lab
+Server:     MSSQL03.corp.apexfiend.lab
 Database:   ReportingDB
-State:      Online
-Recovery:   Full
+State:      Online (presumed consistent with the original MSSQL02 configuration)
+Recovery:   Full (presumed consistent with the original MSSQL02 configuration)
 ```
 
 ## 2. Ownership and Trust Configuration
 
 ```text
-Owner (effective, via role):  svc_reporting — confirmed db_owner
-TRUSTWORTHY:                   ON
+svc_reporting: db_owner of ReportingDB (presumed carried over from the MSSQL02 configuration — not independently re-queried on MSSQL03)
 ```
 
-**`TRUSTWORTHY ON` combined with `db_owner` membership is the configuration that makes the escalation chain documented in `mssql02.md`, Section 4 possible.** `TRUSTWORTHY` controls whether the database is permitted to access resources outside its own context using an impersonation context established inside it (such as an `EXECUTE AS` module) — with it enabled, a module inside `ReportingDB` that runs `EXECUTE AS sql_dba` can have that impersonation honored at the server level, not just within the database.
+The specific mechanism connecting `svc_reporting`'s database-level access to a privileged execution context is no longer a bare `TRUSTWORTHY ON` + `EXECUTE AS sql_dba` combination — see Section 3.
 
-## 3. svc_reporting's Access
+## 3. The Escalation Procedure: SQL Injection in usp_GetReportAnalytics
 
 ```sql
-SELECT dp.name AS principal, r.name AS role FROM sys.database_role_members rm ...
+USE ReportingDB;
+GO
+
+CREATE PROCEDURE dbo.usp_GetReportAnalytics
+    @ReportCategory NVARCHAR(100)
+WITH EXECUTE AS OWNER
+AS
+BEGIN
+    DECLARE @Query NVARCHAR(MAX);
+    SET @Query = N'SELECT LogID, ReportName, ExecutionStatus, ExecutionDate 
+                   FROM dbo.ReportAuditLog 
+                   WHERE ReportCategory = ''' + @ReportCategory + '''';
+    EXEC(@Query);
+END;
+GO
+GRANT EXECUTE ON dbo.usp_GetReportAnalytics TO svc_reporting;
+GO
 ```
 
-```text
-svc_reporting: db_owner
+**`svc_reporting` is granted `EXECUTE` on this procedure.** The procedure concatenates its `@ReportCategory` input directly into a dynamic SQL string with no parameterization, then runs it via `EXEC(@Query)` — a classic SQL injection vulnerability. Because the procedure is defined `WITH EXECUTE AS OWNER`, any query that runs inside it — including an attacker's injected payload — executes in the **owner's** security context, not the caller's. This is the same category of ownership-context escalation documented for the original `MSSQL02` configuration, but the entry point is now an injectable parameter rather than an unconditional context switch.
+
+### Supporting table
+
+```sql
+CREATE TABLE dbo.ReportAuditLog (
+    LogID INT IDENTITY(1,1) PRIMARY KEY,
+    ReportName NVARCHAR(150),
+    ExecutedBy NVARCHAR(100),
+    ExecutionStatus NVARCHAR(50),
+    ExecutionDate DATETIME DEFAULT GETDATE(),
+    ReportCategory NVARCHAR(100)
+);
 ```
 
-At the server level, `svc_reporting` holds only `CONNECT SQL` (`mssql02.md`, Section 3) — no server-level administrative right. `db_owner` within `ReportingDB` is the only privilege it needs, because the `TRUSTWORTHY` + `EXECUTE AS` combination does the rest.
+Populated with fictional sample report rows (e.g., `Monthly_Sales_Q1`, `Quarterly_Tax_Report`) solely to make the injectable query return realistic-looking results.
 
-## 4. The Escalation Procedure
-
-A stored procedure exists within `ReportingDB` configured with `EXECUTE AS sql_dba`. `svc_reporting`, as `db_owner`, can execute it, running with `sql_dba`'s security context — which is `sysadmin` at the server level (`mssql02.md`, Section 3). The procedure's specific name and definition have not been recorded in this document; if useful for `08-attack-paths/sql-path.md` later, it should be captured there with its exact T-SQL.
-
-## 5. Role in the Attack Path
+## 4. Role in the Attack Path
 
 ```text
 MSSQL01 (jobportal_app)
-      │  linked server login mapping
+      │  linked server login mapping (now targets MSSQL03)
       ▼
-MSSQL02 (svc_reporting)
-      │  db_owner on ReportingDB (TRUSTWORTHY ON)
+MSSQL03 (svc_reporting)
+      │  EXECUTE granted on usp_GetReportAnalytics
       ▼
-EXECUTE AS sql_dba  (via the stored procedure)
-      │  sql_dba = sysadmin
+SQL injection via @ReportCategory
+      │  EXECUTE AS OWNER context reached
       ▼
-xp_cmdshell  (tested, then re-disabled)
+Privileged SQL context (owner-equivalent)
       │
       ▼
-OS command execution as corp\svc_mssql02
+OS-level access (confirmed working, consistent with the original MSSQL02 chain)
 ```
 
-This is the fully confirmed and tested chain from the `JobPortal` application's own SQL login, through two SQL Server instances, to OS-level command execution under a domain service account — without ever needing credentials for `sql_dba`, `svc_mssql02`, or any Windows account directly.
+The operator has confirmed this reconfigured chain reaches the same end state as the original `MSSQL02` chain — OS-level access from `svc_reporting`'s starting position, now via SQL injection rather than a direct unconditional `EXECUTE AS` call.
 
-## 6. Validation Status
+## 5. Validation Status
 
 | Item | Status |
 |---|---|
-| Database existence, state, recovery model | Verified |
-| `TRUSTWORTHY ON` | Verified |
-| `svc_reporting` as `db_owner` | Verified |
-| Escalation procedure's existence and `EXECUTE AS sql_dba` configuration | Verified (exact name/definition not recorded) |
-| Full chain tested end-to-end (`xp_cmdshell` → `whoami`) | Verified and tested |
+| Database name, hosted on MSSQL03 | Verified |
+| `svc_reporting` `EXECUTE` grant on `usp_GetReportAnalytics` | Verified (source reviewed) |
+| SQL injection vulnerability in `@ReportCategory` | Verified (source reviewed) |
+| `EXECUTE AS OWNER` elevation | Verified (source reviewed) |
+| `svc_reporting` as `db_owner` | Presumed carried over from MSSQL02; not independently re-queried |
+| Full chain reaching OS-level access | Operator-confirmed as working identically to the prior chain |
 
-## 7. Related Documentation
+## 6. Related Documentation
 
-- `mssql02.md` — Server-level detail for the instance hosting this database
-- `mssql01.md` — The linked-server origin of this chain
+- `mssql03.md` — Server-level detail for the instance now hosting this database
+- `mssql01.md` — The linked-server origin of this chain, repointed to MSSQL03
 - `sql-trust-boundaries.md` — Full synthesis across both instances

@@ -40,7 +40,7 @@ A separate component — referenced in `00-overview/lab-setup.md` as a scheduled
 | CA tier structure | Single-tier Enterprise Root — simplification, not a finding |
 | `UserTemporary` template | Confirmed ESC8-exploitable; `m.ortega` the specific target identity |
 | `PKI-Operations`/`j.derek` access | Confirmed read-only, as designed |
-| Web enrollment (HTTP) availability | Not yet independently verified |
+| Web enrollment (HTTP) availability | Verified — installed and functional |
 | Decoy/noise templates | Present by design; more planned |
 
 ## 7. Validation Status
@@ -49,9 +49,9 @@ A separate component — referenced in `00-overview/lab-setup.md` as a scheduled
 |---|---|
 | CA topology and logical identity | Verified |
 | Template categorization (default vs. custom vs. noise) | Verified (operator-confirmed) |
-| ESC8 as the applicable technique | Confirmed by operator |
-| Web enrollment role installed/enabled on CA02 | Not yet verified |
-| Certificate inventory tooling configuration | Not yet captured |
+| ESC8 as the applicable technique | Confirmed by operator and tested end-to-end — `m.ortega`'s certificate successfully recovered via NTLM relay |
+| Web enrollment role installed/enabled on CA02 | Verified |
+| Certificate inventory tooling configuration | Verified — see `certificate-inventory.md` |
 
 ## 8. Related Documentation
 

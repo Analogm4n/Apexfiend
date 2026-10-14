@@ -54,7 +54,7 @@ sql_dba
 
 **`jobportal_app` is not a member of `sysadmin`** — the application login used by `WEB02`'s JobPortal app has no server-wide administrative rights on `MSSQL01` itself. `CORP\Domain Admins` holding `sysadmin` is a standard (if broad) default grant, consistent with `sql_dba` and the NT SERVICE accounts also present.
 
-## 4. Linked Server — MSSQL02
+## 4. Linked Server — MSSQL03 (replaces MSSQL02)
 
 ```sql
 SELECT name, product, provider, data_source, is_remote_login_enabled FROM sys.servers WHERE is_linked = 1;
@@ -62,18 +62,20 @@ EXEC sp_helplinkedsrvlogin;
 ```
 
 ```text
-Linked server name:    MSSQL02
+Linked server name:    MSSQL02   (local alias name; see note below)
 Provider:               MSOLEDBSQL
-Data source:            MSSQL02.corp.apexfiend.lab
+Data source:            MSSQL03.corp.apexfiend.lab   (repointed — MSSQL03 replaces MSSQL02; see mssql03.md)
 Remote login enabled:   0 (false — explicit login mapping only, no broad remote access)
 
 Login mapping:
-  Local login: jobportal_app  →  Remote login on MSSQL02: svc_reporting
+  Local login: jobportal_app  →  Remote login on MSSQL03: svc_reporting
 ```
 
-**This confirms the precise mechanism behind the MSSQL01 → MSSQL02 stage of `00-overview/attack-path.md`:** any query executed through this linked server using the `jobportal_app` local login is automatically re-authenticated on `MSSQL02` as `svc_reporting`, via an explicit (non-self) login mapping. A principal with access to run queries as `jobportal_app` on `MSSQL01` — such as the JobPortal application itself, or anyone who compromises it — can therefore reach `MSSQL02` under the `svc_reporting` identity without needing `svc_reporting`'s own credentials.
+**Note:** `MSSQL03` has replaced `MSSQL02` as the actual reporting-database host; the linked server's data source was repointed accordingly and confirmed working by the operator. The linked server object's local name may still read `MSSQL02` pending a cleanup rename — this document records the live `data_source`, which is authoritative.
 
-**What this does not yet confirm:** `svc_reporting`'s actual privilege level on `MSSQL02` once there. See `mssql02.md`, Section 3 and the open items in that document — `svc_reporting` is not a `sysadmin` on `MSSQL02` per the role-membership query, so the specific mechanism enabling OS-level access (if any) remains to be identified.
+**This confirms the precise mechanism behind the MSSQL01 → MSSQL03 stage of `00-overview/attack-path.md`:** any query executed through this linked server using the `jobportal_app` local login is automatically re-authenticated on `MSSQL03` as `svc_reporting`, via an explicit (non-self) login mapping. A principal with access to run queries as `jobportal_app` on `MSSQL01` — such as the JobPortal application itself, or anyone who compromises it — can therefore reach `MSSQL03` under the `svc_reporting` identity without needing `svc_reporting`'s own credentials.
+
+`svc_reporting`'s privilege level on the remote end is documented in `mssql03.md` — `svc_reporting` is not `sysadmin` there either; access to a privileged context is instead reached via a SQL injection vulnerability in a stored procedure (`usp_GetReportAnalytics`, `EXECUTE AS OWNER`), confirmed working end-to-end.
 
 ## 5. Databases
 
@@ -101,11 +103,11 @@ SELECT name, state_desc, recovery_model_desc FROM sys.databases;
 | `sysadmin` role membership | Verified |
 | Linked server configuration and login mapping | Verified |
 | Database inventory | Verified |
-| `svc_reporting`'s effective privilege on `MSSQL02` | Not yet confirmed — see `mssql02.md` |
+| `svc_reporting`'s effective privilege on `MSSQL03` | Verified — see `mssql03.md` |
 
 ## 7. Related Documentation
 
-- `mssql02.md` — The linked server's remote end; `svc_reporting`'s actual permissions
+- `mssql03.md` — The linked server's remote end (replaces `mssql02.md`); `svc_reporting`'s actual permissions
 - `recruitmentdb.md` *(pending rename to `jobportal.md`?)* — Database-level detail for `JobPortal`
 - `../04-web-and-collaboration/web02.md` — The application connecting as `jobportal_app`
-- `sql-trust-boundaries.md` *(pending)* — Synthesis of the MSSQL01→MSSQL02 trust relationship
+- `sql-trust-boundaries.md` — Synthesis of the MSSQL01→MSSQL03 trust relationship
