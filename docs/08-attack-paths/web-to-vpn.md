@@ -13,7 +13,7 @@ ipconfig:  10.0.100.12 (external/development network — see 01-architecture/net
 
 Enumeration of the `developer` user's profile surfaces several items of interest:
 
-- **`r.andrews-vpn.ovpn`** on the Desktop — a VPN client profile belonging to a *different* user, `r.andrews`. This is the same `r.andrews` already present as a local pfSense GUI user (`03-network-services/pfsense.md`, Section 3) — confirming that a pfSense-level account also has lab VPN access, distinct from the domain-integrated OpenVPN remote-access configuration already documented.
+- **`d.ramirez-vpn.ovpn`** on the Desktop — a VPN client profile belonging to `d.ramirez`, the same identity later confirmed as the domain account reached in Section 5. Finding this profile here, before any domain credentials have been recovered, is what first establishes `d.ramirez` as the person behind the `developer`/`dev` activity on this machine.
 - **Mozilla Firefox**, installed and used, with a saved-password store.
 - **`Credentials.kdbx`**, a KeePass database, in Documents.
 - **PSTools** (Sysinternals), downloaded but not yet used at this stage.
@@ -22,11 +22,11 @@ Enumeration of the `developer` user's profile surfaces several items of interest
 
 The Firefox profile directory is archived and exfiltrated to the attacker's own host via `scp` **initiated outbound from DEV-LAPTOP** — deliberately reversing the usual direction, since an outbound connection from an internal/DMZ-adjacent host is far less likely to be blocked by firewall egress policy than an inbound one. `firefox_decrypt` run offline against the extracted profile recovers multiple saved site credentials, including `d.ramirez@apexfiend.lab`'s mail credentials and several personal-site credentials for the same person — `d.ramirez` is the actual human behind the `developer`/`dev` activity on this machine.
 
-**Credential reuse across the harvested secrets opens the KeePass database**: one of the Firefox-recovered passwords successfully unlocks `Credentials.kdbx`, revealing domain credentials for `d.ramirez`, a reference to workstation `WK01`, and further Outlook credentials. This is a realistic password-reuse finding — the same weakness repeatedly exploited across the lab's design (`02-active-directory/acl-design.md`'s Help Desk chain relies on a related principle: reachable, reusable access once a single credential set is obtained).
+**Credential reuse across the harvested secrets opens the KeePass database**: one of the Firefox-recovered passwords successfully unlocks `Credentials.kdbx`, revealing `d.ramirez`'s domain credentials (the same credentials used for both the VPN profile in Section 2 and the domain logon in Section 5), a reference to workstation `WK01`, and further Outlook credentials. This is a realistic password-reuse finding — the same weakness repeatedly exploited across the lab's design (`02-active-directory/acl-design.md`'s Help Desk chain relies on a related principle: reachable, reusable access once a single credential set is obtained).
 
-## 4. VPN Access as r.andrews
+## 4. VPN Access as d.ramirez
 
-The `r.andrews-vpn.ovpn` profile found in Section 2 is adapted for non-interactive, GUI-less use on the Windows host (no desktop session is available over the current shell) by appending an `auth-user-pass` directive pointing at a credentials file, populated with `r.andrews`'s own recovered credentials. The OpenVPN Connect client is installed as a service and started with this profile, successfully establishing a tunnel:
+The `d.ramirez-vpn.ovpn` profile found in Section 2 is adapted for non-interactive, GUI-less use on the Windows host (no desktop session is available over the current shell) by appending an `auth-user-pass` directive pointing at a credentials file, populated with `d.ramirez`'s own credentials recovered from KeePass (Section 3). The OpenVPN Connect client is installed as a service and started with this profile, successfully establishing a tunnel:
 
 ```text
 VPN adapter IPv4 address: 10.0.200.2
@@ -36,7 +36,7 @@ This falls within the documented VPN tunnel network, `10.0.200.0/24` (`03-networ
 
 ## 5. Reaching WK01
 
-With the VPN tunnel active, a reverse SSH port-forward is established from DEV-LAPTOP back to the attacker's host, forwarding local port 3389 to `172.16.60.104:3389` — `WK01`'s RDP port, reachable only now that DEV-LAPTOP has VPN-routed access into `172.16.60.0/24` (the sole network the VPN pushes, per `vpn-config.md`, Section 4). RDP is then reached from the attacker's own machine through that tunnel, authenticating with `d.ramirez`'s domain credentials recovered from KeePass in Section 3:
+With the VPN tunnel active, a reverse SSH port-forward is established from DEV-LAPTOP back to the attacker's host, forwarding local port 3389 to `172.16.60.104:3389` — `WK01`'s RDP port, reachable only now that DEV-LAPTOP has VPN-routed access into `172.16.60.0/24` (the sole network the VPN pushes, per `vpn-config.md`, Section 4). RDP is then reached from the attacker's own machine through that tunnel, authenticating with the same `d.ramirez` domain credentials used for the VPN connection itself:
 
 ```text
 whoami:    corp\d.ramirez
@@ -58,7 +58,7 @@ WEB01 (dev, host)
       ▼
 DEV-LAPTOP (developer)
       │  Firefox credential harvest → KeePass unlock (password reuse)
-      │  r.andrews' VPN profile + recovered credentials
+      │  d.ramirez's own VPN profile + recovered credentials
       ▼
 VPN tunnel (10.0.200.0/24) → routes only to VLAN 60
       │  reverse SSH port-forward (RDP)
@@ -74,12 +74,12 @@ WK01 — corp\d.ramirez
 | DEV-LAPTOP enumeration findings | Tested and confirmed |
 | Firefox credential extraction | Tested and confirmed |
 | KeePass unlock via Firefox-recovered password reuse | Tested and confirmed |
-| VPN connection as `r.andrews`, tunnel network confirmed | Tested and confirmed |
+| VPN connection as `d.ramirez`, tunnel network confirmed | Tested and confirmed |
 | Reverse SSH tunnel + RDP to WK01 as `d.ramirez` | Tested and confirmed |
 
 ## 8. Related Documentation
 
 - `initial-access.md` — Precedes this document; WEB01 compromise through the forwarded-agent pivot
 - `helpdesk-escalation.md` *(pending)* — Continues from WK01: Laura → Miguel → Daniel
-- `../03-network-services/vpn-config.md`, `pfsense.md` — VPN and `r.andrews` account detail
+- `../03-network-services/vpn-config.md` — VPN tunnel network and client routing
 - `../00-overview/attack-path.md` — Stage 1 (kept intentionally general; this document is the detailed counterpart)
