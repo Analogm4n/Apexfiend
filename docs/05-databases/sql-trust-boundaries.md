@@ -29,7 +29,7 @@ As with the original chain, no password, hash, or Kerberos ticket needs to be st
 
 ## 6. Status of the Linked-Server RPC Alternate Path
 
-The previously-documented alternate path — direct `OPENQUERY`/`EXEC...AT` access via the linked server's `RPC Out`/`Data Access` settings (confirmed enabled and tested against the original `MSSQL02`) — has not been independently re-confirmed against `MSSQL03`. Given the linked server configuration was reported as carried over "exactly as in MSSQL02," this path presumably still exists, but this should be re-verified rather than assumed.
+**Confirmed and re-verified against `MSSQL03`.** `08-attack-paths/sql-path.md` documents a direct, tested `EXEC ('select @@version') AT mssql03` call succeeding from `MSSQL01`, and goes further — the production SQL-injection chain itself was executed *through* this same RPC pivot (`EXEC (@sql) AT [MSSQL03]` wrapping the injected call to `usp_GetReportAnalytics`), rather than by connecting to `MSSQL03` directly. The two paths documented in this file are not merely parallel alternatives; in the tested attack chain, one was used as the delivery mechanism for the other.
 
 ## 7. Validation Status
 
@@ -38,7 +38,7 @@ The previously-documented alternate path — direct `OPENQUERY`/`EXEC...AT` acce
 | `EXECUTE AS OWNER` + SQL injection as the root cause of the escalation | Verified (source reviewed) |
 | Chain tested end-to-end, reaching OS-level access | Operator-confirmed |
 | `j.derek`'s scheduled task co-located on the same host | Verified |
-| Linked-server RPC/`OPENQUERY` alternate path re-confirmed on MSSQL03 | Not yet re-verified |
+| Linked-server RPC/`OPENQUERY` alternate path re-confirmed on MSSQL03 | Tested and confirmed — see `08-attack-paths/sql-path.md` |
 
 ## 8. Related Documentation
 
