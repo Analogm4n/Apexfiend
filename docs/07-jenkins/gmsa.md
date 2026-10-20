@@ -28,7 +28,7 @@ Matches what was already confirmed in `02-active-directory/users-and-groups.md`,
 | Dispatcher (scheduled task, the "build agent" of earlier documentation) | `svc_automation$` |
 | Dispatcher's local action scripts (`Actions\*.ps1`, including the AppLocker-protected `Maintenance.ps1`) | `svc_automation$` (inherits the Dispatcher's own context) |
 
-**Earlier project documentation (`00-overview/lab-setup.md`, `attack-path.md`) described the gMSA's Kerberos material as obtained by dumping LSASS from "the Jenkins process" on `JENKINS01`.** That description needs refining: the Jenkins *controller* process itself runs as `LocalSystem`, not the gMSA — `svc_automation$`'s material lives in the memory of the **`ApexAutomationAgent`** process and/or the **Dispatcher** process, both of which run continuously as the gMSA. Either is a valid target for the documented credential-dumping stage; "the Jenkins process" as previously worded is imprecise and should be updated to name one or both of these specifically.
+**Superseded — the real, tested technique does not involve LSASS dumping at all.** Earlier project documentation (`00-overview/lab-setup.md`, `attack-path.md`) described the gMSA's Kerberos material as obtained by dumping LSASS from "the Jenkins process" on `JENKINS01`. `08-attack-paths/jenkins-path.md` documents what actually happens once local `Administrator` access is obtained on `JENKINS01`: the `ApexAutomationAgent` service — already configured to run as `svc_automation$` (confirmed via `sc.exe qc`) — has its binary path reconfigured to point at an attacker-controlled executable (staged through a confirmed AppLocker-bypass path), and the service is restarted. The Service Control Manager launches the new binary directly under the gMSA's identity; because gMSA passwords are managed and resolved transparently by Windows, no credential material ever needs to be extracted from memory. This is a cleaner, more realistic technique than LSASS dumping and is the one actually exercised end-to-end in this lab.
 
 ## 4. Attack-Path Relevance
 
@@ -54,7 +54,8 @@ This confirms and sharpens `attack-path.md` Stages 9–11: the credential-dumpin
 | gMSA password-retrieval principals | Verified (consistent with prior `02-active-directory/` findings) |
 | No delegation configured | Verified (consistent with prior findings) |
 | Execution identity across all JENKINS01 automation processes | Verified (operator-confirmed) |
-| Correction needed to `attack-path.md`/`lab-setup.md`'s "Jenkins process" wording | Identified; update pending |
+| Credential-access technique: service binary hijack (not LSASS dump) | Tested and confirmed — see `08-attack-paths/jenkins-path.md`, Section 6 |
+| Correction needed to `attack-path.md`/`lab-setup.md`'s "LSASS dump of the Jenkins process" wording | Identified; update still pending in those two documents |
 
 ## 6. Related Documentation
 
