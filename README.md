@@ -1,67 +1,44 @@
-# Apexfiend
+# Apexfiend — Active Directory Penetration Testing Lab
 
-An Active Directory lab designed and built from scratch to practice and document offensive security / red teaming techniques against a simulated corporate environment: `corp.apexfiend.lab`.
+Apexfiend is a self-built, fully isolated Active Directory penetration testing lab designed to simulate a realistic enterprise compromise — from an unauthenticated external foothold to full Domain Administrator-equivalent control of the environment (`corp.apexfiend.lab`).
 
-The project covers both the **infrastructure design** (network, AD, PKI, Jenkins CI/CD, databases, internal web services) and the **full execution of an intentionally designed attack chain**, from external initial access to full domain compromise.
+The lab combines a vulnerable public-facing web application, realistic internal credential-hygiene weaknesses, and three independent, fully-chained Active Directory escalation paths (database/application, certificate services, and CI/CD automation) that converge on full domain compromise. It is built, tested, and documented end-to-end against real lab output — no step in this repository is speculative.
 
-## Why this project
+> ⚠️ **Lab disclaimer:** Apexfiend is a private, isolated lab environment built for offensive security training and portfolio purposes. It is not a real client engagement. Any report-style language (client name, confidentiality statements, etc.) found in `docs/09-reporting/` is written in a professional format intentionally, to reflect real-world deliverable standards — it does not describe an actual organization or a real assessment.
 
-Built to practice and demonstrate, end-to-end:
+## 📂 Repository Map
 
-- Design of realistic Active Directory architectures (OUs, delegations, ACLs, gMSA).
-- Configuration of Active Directory Certificate Services (ADCS) with an intentionally misconfigured certificate template.
-- Exploitation of trust relationships between SQL Server instances (linked servers).
-- Abuse of Resource-Based Constrained Delegation (RBCD) and Shadow Credentials.
-- Technical documentation at the level of a real production environment, including reporting in a professional pentest report format.
+| Folder | Contents | Status |
+|---|---|---|
+| `docs/00-07/` | Lab architecture, Active Directory structure, network layout, and supporting infrastructure documentation | ✅ Complete |
+| `docs/08-attack-paths/` | Reasoning-level narrative for each validated escalation path (initial access, web-to-VPN pivot, helpdesk escalation, SQL path, PKI path, Jenkins/RBCD path, full attack chain) | ✅ Complete (8/8) |
+| `docs/09-reporting/` | Professional technical penetration test report — executive summary, risk ratings, findings, and remediation roadmap | ✅ Complete |
+| `writeups/` | Step-by-step technical walkthroughs with full exploitation detail, compiled from raw testing transcripts | ⏳ In progress |
+| [`pki-documentation`](#) *(separate repo)* | Deep-dive on the AD CS / certificate services misconfiguration (ESC8) exploited in this lab | ✅ Complete |
 
-## Repository structure
+## Where to Start
 
-```
-Apexfiend/
-├── README.md
-├── CHANGELOG.md
-├── LICENSE
-├── .gitignore
-│
-├── docs/
-│   ├── 00-overview/              # What the project is, objectives, scope, how to set it up
-│   ├── 01-architecture/          # Network topology, VLANs, AD forest, diagrams
-│   ├── 02-active-directory/      # Domains, OUs, users/groups, ACLs, Kerberos
-│   ├── 03-network-services/      # pfSense, DNS, VPN, segmentation
-│   ├── 04-web-and-collaboration/ # Web servers, Gitea, Mattermost, osTicket, mail
-│   ├── 05-databases/             # SQL architecture, MSSQL01/02, trust boundaries
-│   ├── 06-pki/                   # ADCS, CA01, certificate templates
-│   ├── 07-jenkins/               # CI/CD architecture, jobs, gMSA, build agent
-│   ├── 08-attack-paths/          # Designed attack chain, step by step, by vector
-│   ├── 09-reporting/             # Findings report in professional pentest format
-│   └── 10-development-log/       # Design milestones and decisions for the lab
-│
-├── lab/                          # Diagrams, configs, scripts, and provisioning templates
-├── writeups/                     # Actual execution of the attack chain (enumeration → post-exploitation)
-└── evidence/                     # Screenshots and sanitized output from the run-through
-```
+- Start with [`docs/09-reporting/`](./docs/09-reporting/) — the professional report gives the full picture (scope, methodology, findings, and recommendations) without requiring you to read the raw exploitation steps.
+- `docs/08-attack-paths/` documents how each escalation path was reasoned through and chained, and `writeups/` (once complete) will walk through the exact commands and tooling used.
+- `docs/00-07/` covers the Active Directory forest, network segmentation, and host inventory the lab is built on.
 
-> The difference between `docs/08-attack-paths/` and `writeups/`: the former documents **the design** of the attack chain (the intent behind each step); the latter documents **the actual execution** (commands, output, screenshots), as if it were the fieldwork of a pentester solving the lab for the first time.
+## Attack Path Overview
 
-## Quick index
+The compromise begins at the external perimeter, pivots into the internal network via a developer workstation and VPN access, and then branches into **three independent, fully-validated privilege escalation paths** — any one of which alone is sufficient to reach full domain compromise:
 
-| Section | Description |
-|---|---|
-| [Overview](docs/00-overview/project-overview.md) | What Apexfiend is and why it exists |
-| [Network architecture](docs/01-architecture/network-topology.md) | Topology, VLANs, segmentation |
-| [Active Directory](docs/02-active-directory/domains.md) | Forest design, OUs, delegations |
-| [PKI / ADCS](docs/06-pki/adcs-architecture.md) | CA01 and certificate templates |
-| [Jenkins / CI-CD](docs/07-jenkins/architecture.md) | Automation, gMSA, health checks |
-| [Full attack chain](docs/08-attack-paths/full-attack-chain.md) | From initial access to DCSync |
-| [Findings and remediation](docs/09-reporting/findings.md) | Client-facing findings report |
+1. **Database / Application path** — SQL injection in an internal web application's reporting functionality, chained through a linked server, to OS-level command execution.
+2. **Certificate Services path** — A misconfigured certificate template combined with an NTLM-relayable enrollment endpoint (ESC8), used to obtain a certificate impersonating a privileged user.
+3. **CI/CD & Delegation path** — Hijack of an automation service account via a legacy credential pattern, chained with over-permissioned Active Directory delegation, to achieve Resource-Based Constrained Delegation (RBCD) against a critical server.
 
-## Project status
+Full detail on each path lives in `docs/08-attack-paths/` and the companion write-ups.
 
-Under active development. See [CHANGELOG.md](CHANGELOG.md) for the change history and [docs/10-development-log/milestones.md](docs/10-development-log/milestones.md) for design milestones.
+## Tooling
 
-## Disclaimer
+A full list of tools and techniques used across the engagement is maintained in `docs/09-reporting/` (Appendix A).
 
-This is an isolated lab environment, built exclusively for educational and personal practice purposes. No component, credential, IP address, or data shown in this repository corresponds to real systems or information.
+## License / Usage
+
+This repository documents a private lab environment built for educational and professional portfolio purposes. It does not target or reference any real organization, individual, or production system.
 
 ## Author
 
