@@ -1,6 +1,6 @@
 # Apexfiend — Network Penetration Test Report
 
-*Prepared by Jean Pierre Miranda Torres | Offensive Security Practitioner | \[Assessment Period: TBD\] | CONFIDENTIAL*
+*Prepared by Jean Pierre Miranda Torres | Junior Pentester | \[Assessment Period: TBD\] | CONFIDENTIAL*
 
 ## 1. Statement of Confidentiality
 
