@@ -62,7 +62,7 @@ Apexfiend/
 │   │   ├── gmsa.md
 │   │   └── automation-worker.md
 │   │
-│   ├── 08-attack-paths/          ⬜ pendiente
+│   ├── 08-attack-paths/          ✅ completo
 │   │   ├── initial-access.md
 │   │   ├── web-to-vpn.md
 │   │   ├── sql-path.md
@@ -71,7 +71,7 @@ Apexfiend/
 │   │   ├── rbcd-path.md
 │   │   └── full-attack-chain.md
 │   │
-│   ├── 09-reporting/             ⬜ pendiente
+│   ├── 09-reporting/             ✅ completo
 │   │   ├── executive-summary.md
 │   │   ├── findings.md
 │   │   ├── remediation.md
