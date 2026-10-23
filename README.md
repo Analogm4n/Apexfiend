@@ -4,7 +4,7 @@ Apexfiend is a self-built, fully isolated Active Directory penetration testing l
 
 The lab combines a vulnerable public-facing web application, realistic internal credential-hygiene weaknesses, and three independent, fully-chained Active Directory escalation paths (database/application, certificate services, and CI/CD automation) that converge on full domain compromise. It is built, tested, and documented end-to-end against real lab output — no step in this repository is speculative.
 
-> ⚠️ **Lab disclaimer:** Apexfiend is a private, isolated lab environment built for offensive security training and portfolio purposes. It is not a real client engagement. Any report-style language (client name, confidentiality statements, etc.) found in `docs/09-reporting/` is written in a professional format intentionally, to reflect real-world deliverable standards — it does not describe an actual organization or a real assessment.
+> ⚠️ **Lab disclaimer:** Apexfiend is a private, isolated lab environment built for offensive security training and portfolio purposes. It is not a real client engagement. Any report-style language (client name, confidentiality statements, etc.) found in `professional-technical-report/` is written in a professional format intentionally, to reflect real-world deliverable standards — it does not describe an actual organization or a real assessment.
 
 ## 📂 Repository Map
 
@@ -12,13 +12,13 @@ The lab combines a vulnerable public-facing web application, realistic internal 
 |---|---|---|
 | `docs/00-07/` | Lab architecture, Active Directory structure, network layout, and supporting infrastructure documentation | ✅ Complete |
 | `docs/08-attack-paths/` | Reasoning-level narrative for each validated escalation path (initial access, web-to-VPN pivot, helpdesk escalation, SQL path, PKI path, Jenkins/RBCD path, full attack chain) | ✅ Complete |
-| `docs/09-reporting/` | Professional technical penetration test report — executive summary, risk ratings, findings, and remediation roadmap | ✅ Complete |
+| `professional-technical-report/` | Professional technical penetration test report — executive summary, risk ratings, findings, and remediation roadmap | ✅ Complete |
 | `writeups/` | Step-by-step technical walkthroughs with full exploitation detail, compiled from raw testing transcripts | ⏳ In progress |
 | [`pki-documentation`](#) *(separate repo)* | Deep-dive on the AD CS / certificate services misconfiguration (ESC8) exploited in this lab | ✅ Complete |
 
 ## Where to Start
 
-- Start with [`docs/09-reporting/`](./docs/09-reporting/) — the professional report gives the full picture (scope, methodology, findings, and recommendations) without requiring you to read the raw exploitation steps.
+- Start with [`professional-technical-report`](./professional-technical-report/) — the professional report gives the full picture (scope, methodology, findings, and recommendations) without requiring you to read the raw exploitation steps.
 - `docs/08-attack-paths/` documents how each escalation path was reasoned through and chained, and `writeups/` (once complete) will walk through the exact commands and tooling used.
 - `docs/00-07/` covers the Active Directory forest, network segmentation, and host inventory the lab is built on.
 
@@ -34,7 +34,7 @@ Full detail on each path lives in `docs/08-attack-paths/` and the companion writ
 
 ## Tooling
 
-A full list of tools and techniques used across the engagement is maintained in `docs/09-reporting/` (Appendix A).
+A full list of tools and techniques used across the engagement is maintained in `professional-technical-report/` (Appendix A).
 
 ## License / Usage
 
