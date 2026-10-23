@@ -14,7 +14,6 @@ The lab combines a vulnerable public-facing web application, realistic internal 
 | `docs/08-attack-paths/` | Reasoning-level narrative for each validated escalation path (initial access, web-to-VPN pivot, helpdesk escalation, SQL path, PKI path, Jenkins/RBCD path, full attack chain) | ✅ Complete |
 | `professional-technical-report/` | Professional technical penetration test report — executive summary, risk ratings, findings, and remediation roadmap | ⏳ In progress |
 | `writeups/` | Step-by-step technical walkthroughs with full exploitation detail, compiled from raw testing transcripts | ⏳ In progress |
-| [`pki-documentation`](#) *(separate repo)* | Deep-dive on the AD CS / certificate services misconfiguration (ESC8) exploited in this lab | ✅ Complete |
 
 ## Where to Start
 
